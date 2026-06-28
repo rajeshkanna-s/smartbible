@@ -244,32 +244,35 @@ function paintVerseCanvas(
 }
 
 function getHeroFontSize(text: string, ratio: Ratio, scale: number): string {
-  const len = text.length;
-  let baseRem = 1.4;
+  const len = Math.max(20, text.length);
+
+  let availH = 84;
+  let refH = 15;
+  let availW = 88;
+  let minPx = 13;
+  let maxPx = 36;
+  let buffer = 0.82;
 
   if (ratio === 'wide') {
-    baseRem = Math.max(0.75, 1.9 - len * 0.005);
-  } else if (ratio === 'square') {
-    baseRem = Math.max(0.85, 2.3 - len * 0.0065);
-  } else { // story
-    baseRem = Math.max(0.8, 2.3 - len * 0.0075);
-  }
-
-  let factor = 3.33;
-  let minPx = 11;
-  let maxPx = 44;
-
-  if (ratio === 'wide') {
-    factor = 2.5;
-    minPx = 11;
-    maxPx = 40;
+    availH = 56.25;
+    refH = 12;
+    availW = 80;
+    minPx = 12;
+    maxPx = 28;
+    buffer = 0.85;
   } else if (ratio === 'story') {
-    factor = 4.44;
-    minPx = 11;
-    maxPx = 48;
+    availH = 178;
+    refH = 22;
+    availW = 84;
+    minPx = 13;
+    maxPx = 34;
+    buffer = 0.8;
   }
 
-  return `clamp(${minPx}px, calc(${baseRem} * ${factor}cqw * ${scale}), ${maxPx}px)`;
+  // Calculate dynamic cqw font size based on character density and container geometry
+  const calculatedCqw = Math.sqrt((availH - refH) * availW / (0.825 * len)) * buffer;
+
+  return `clamp(${minPx}px, calc(${calculatedCqw.toFixed(2)}cqw * ${scale}), ${maxPx}px)`;
 }
 
 function getFullviewFontSize(text: string, scale: number): string {
