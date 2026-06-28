@@ -278,11 +278,13 @@ function getHeroFontSize(text: string, ratio: Ratio, scale: number): string {
 function getFullviewFontSize(text: string, scale: number, w: number, h: number): string {
   const len = Math.max(20, text.length);
 
-  const availW = w * 0.88;
+  // availW is capped at 1100px because .fullview-inner has max-width: 1100px
+  const availW = Math.min(1100, w * 0.88);
   const availH = h * 0.88 - 160;
 
   const buffer = 0.82;
-  const calculatedPx = Math.sqrt(availH * availW / (0.77 * len)) * buffer;
+  // Using 0.95 factor to account for wider Tamil/non-English script characters
+  const calculatedPx = Math.sqrt(availH * availW / (0.95 * len)) * buffer;
 
   const minPx = 14;
   const maxPx = Math.min(64, w * 0.08);
