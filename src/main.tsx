@@ -174,14 +174,18 @@ const RATIO_SIZES: Record<Ratio, { w: number; h: number }> = {
   wide: { w: 1920, h: 1080 },
 };
 
-// Render the verse onto a canvas and return the PNG blob (used for download + share).
-function renderVerseCanvas(verse: BibleVerse, theme: Theme, ratio: Ratio): HTMLCanvasElement | null {
+// Paint the verse image onto a given canvas at the chosen aspect ratio.
+function paintVerseCanvas(
+  canvas: HTMLCanvasElement,
+  verse: BibleVerse,
+  theme: Theme,
+  ratio: Ratio,
+): boolean {
   const { w, h } = RATIO_SIZES[ratio];
-  const canvas = document.createElement('canvas');
   canvas.width = w;
   canvas.height = h;
   const ctx = canvas.getContext('2d');
-  if (!ctx) return null;
+  if (!ctx) return false;
 
   const bg = ctx.createLinearGradient(0, 0, w, h);
   bg.addColorStop(0, theme.a);
@@ -236,7 +240,12 @@ function renderVerseCanvas(verse: BibleVerse, theme: Theme, ratio: Ratio): HTMLC
   ctx.font = `700 ${Math.round(unit * 0.024)}px ${PNG_FONT}`;
   ctx.fillText('Smart Bible', w / 2, h - refZone * 0.18);
 
-  return canvas;
+  return true;
+}
+
+function renderVerseCanvas(verse: BibleVerse, theme: Theme, ratio: Ratio): HTMLCanvasElement | null {
+  const canvas = document.createElement('canvas');
+  return paintVerseCanvas(canvas, verse, theme, ratio) ? canvas : null;
 }
 
 function downloadVersePng(verse: BibleVerse, theme: Theme, ratio: Ratio = 'square') {
@@ -625,6 +634,7 @@ function App() {
   const fullRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const resultsRef = useRef<HTMLElement>(null);
+  const previewRef = useRef<HTMLCanvasElement>(null);
   const didMountRef = useRef(false);
 
   useEffect(() => {
@@ -798,6 +808,19 @@ function App() {
       heroRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [focused]);
+
+  // Live preview of the downloadable image — reflects ratio + theme + verse.
+  useEffect(() => {
+    const canvas = previewRef.current;
+    if (!heroVerse || !canvas) return;
+    if (!paintVerseCanvas(canvas, heroVerse, theme, pngRatio)) return;
+    const { w, h } = RATIO_SIZES[pngRatio];
+    const maxW = 380;
+    const maxH = 320;
+    const scale = Math.min(maxW / w, maxH / h, 1);
+    canvas.style.width = `${Math.round(w * scale)}px`;
+    canvas.style.height = `${Math.round(h * scale)}px`;
+  }, [heroVerse?.id, theme.id, pngRatio]);
 
   // On small screens the filter bar fills the viewport, so scroll the results into
   // view once a filter is applied. Debounced so typing a search doesn't jump per key.
@@ -1554,6 +1577,13 @@ function App() {
                   </button>
                 ))}
               </div>
+            </div>
+
+            <div className="png-preview-wrap">
+              <canvas className="png-preview" ref={previewRef} aria-label="Image preview" />
+              <span className="png-preview-cap">
+                Preview · {RATIO_SIZES[pngRatio].w}×{RATIO_SIZES[pngRatio].h}
+              </span>
             </div>
 
             <div className="explain-actions">

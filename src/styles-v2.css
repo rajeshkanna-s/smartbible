@@ -215,6 +215,31 @@
   min-width: 84px;
 }
 
+.png-preview-wrap {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+}
+
+.png-preview {
+  background: #232a73;
+  border-radius: 14px;
+  box-shadow: 0 16px 36px rgba(35, 42, 115, 0.28);
+  display: block;
+  max-width: 100%;
+}
+
+.png-preview-cap {
+  color: #6b7689;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.app-shell.dark .png-preview-cap {
+  color: #9aa6b8;
+}
+
 /* ---- AI follow-up chat ---- */
 .ai-chat {
   border-top: 1px dashed #d9deec;
