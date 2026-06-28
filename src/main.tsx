@@ -635,7 +635,17 @@ function App() {
   const heroRef = useRef<HTMLDivElement>(null);
   const resultsRef = useRef<HTMLElement>(null);
   const previewRef = useRef<HTMLCanvasElement>(null);
+  const utterRef = useRef<SpeechSynthesisUtterance | null>(null);
   const didMountRef = useRef(false);
+
+  // Preload speech-synthesis voices (they populate asynchronously in Chrome).
+  useEffect(() => {
+    if (!('speechSynthesis' in window)) return;
+    const warm = () => window.speechSynthesis.getVoices();
+    warm();
+    window.speechSynthesis.addEventListener('voiceschanged', warm);
+    return () => window.speechSynthesis.removeEventListener('voiceschanged', warm);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -932,22 +942,36 @@ function App() {
     }
   }
   function speak(verse: BibleVerse) {
-    if (!('speechSynthesis' in window)) return;
+    if (!('speechSynthesis' in window)) {
+      setError('Read aloud is not supported in this browser.');
+      return;
+    }
     const synth = window.speechSynthesis;
-    if (speaking) {
+    if (speaking || synth.speaking) {
       synth.cancel();
       setSpeaking(false);
       return;
     }
     synth.cancel();
+
     const utter = new SpeechSynthesisUtterance(verse.text);
-    utter.lang = SPEECH_LANG[state.languageId] || 'en-US';
-    const base = utter.lang.slice(0, 2).toLowerCase();
-    const match = synth.getVoices().find((v) => v.lang && v.lang.toLowerCase().startsWith(base));
+    const lang = SPEECH_LANG[state.languageId] || 'en-US';
+    const base = lang.slice(0, 2).toLowerCase();
+    const voices = synth.getVoices();
+    const match =
+      voices.find((v) => v.lang && v.lang.toLowerCase() === lang.toLowerCase()) ||
+      voices.find((v) => v.lang && v.lang.toLowerCase().startsWith(base));
     if (match) utter.voice = match;
+    utter.lang = match?.lang || lang;
+    utter.rate = 0.95;
     utter.onend = () => setSpeaking(false);
     utter.onerror = () => setSpeaking(false);
+
+    // Keep a reference so Chrome doesn't garbage-collect the utterance mid-speech.
+    utterRef.current = utter;
     setSpeaking(true);
+    // Chrome sometimes leaves the queue paused; resume defensively.
+    synth.resume();
     synth.speak(utter);
   }
 
