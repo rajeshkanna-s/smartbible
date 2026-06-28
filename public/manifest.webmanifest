@@ -1,0 +1,15 @@
+{
+  "name": "Smart Bible",
+  "short_name": "Smart Bible",
+  "description": "Read and filter the Bible in English, Tamil, Malayalam, Telugu and Hindi.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#eef1f8",
+  "theme_color": "#2e4a36",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

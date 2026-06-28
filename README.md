@@ -6,12 +6,19 @@ Read and filter the whole Bible in **English, Tamil, Malayalam, Telugu, and Hind
 ## Features
 
 - **Multi-language** – full Bible (66 books, ~31,000 verses) in 5 languages, bundled locally as JSON.
-- **Powerful filters** – by Book / Chapter / Verse, testament (Old/New), word search, or a reference code like `John 14:6` or `14:6`.
-- **Single-verse view** – shows the verse on a shareable gradient card.
+- **Powerful filters** – by Book / Chapter / Verse, testament (Old/New), word search (with match highlighting), or a reference code like `John 14:6` or `14:6`.
+- **Single-verse view** – shows the verse on a shareable gradient card, with 8 selectable colour themes.
+- **Verse navigation** – step prev/next verse or chapter without leaving the verse.
+- **Chapter reading mode** – read a whole chapter as flowing text, like a real Bible page.
 - **Full view** – fullscreen, distraction-free display (great for projecting).
-- **Download as PNG** – export any verse as a 1080×1080 image.
-- **AI explanation** – an optional written explanation of a verse (Meaning / Context / Application) in the selected language.
+- **Download / Share as PNG** – export any verse as an image (square / story / wide), or share via the device share sheet.
+- **Copy & read aloud** – copy the verse text, or have it read out with speech synthesis.
+- **Bookmarks & history** – save favourite verses and revisit recently viewed ones (stored locally).
+- **Personalize** – dark mode, text-size control, and remembered last language / theme / verse.
+- **AI explanation** – a written explanation (Meaning / Context / Application) in the selected language, with follow-up questions.
+- **Find verses by topic** – type a theme (e.g. *forgiveness*) and jump to AI-suggested references; plus related cross-references for any verse.
 - **Compare languages** – see the same verse in all five languages side by side.
+- **Installable PWA** – add to home screen and use offline.
 
 ## Getting started
 
