@@ -303,21 +303,15 @@
 
 /* ---- Fullview Overlay Responsiveness & Centering ---- */
 .fullview-overlay {
-  justify-content: flex-start;
-  overflow-y: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.fullview-overlay::-webkit-scrollbar {
-  display: none;
+  justify-content: center; /* Center vertically since we don't scroll */
+  overflow: hidden; /* Prevent scrolling entirely */
 }
 
 .fullview-inner {
-  margin-top: auto;
-  margin-bottom: auto;
-  padding-top: 80px;
-  padding-bottom: 120px;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
   width: 100%;
 }
 

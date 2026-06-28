@@ -275,17 +275,21 @@ function getHeroFontSize(text: string, ratio: Ratio, scale: number): string {
   return `clamp(${minPx}px, calc(${calculatedCqw.toFixed(2)}cqw * ${scale}), ${maxPx}px)`;
 }
 
-function getFullviewFontSize(text: string, scale: number): string {
-  const len = text.length;
-  let baseRem = 2.4;
+function getFullviewFontSize(text: string, scale: number, w: number, h: number): string {
+  const len = Math.max(20, text.length);
 
-  if (len < 100) baseRem = 2.8;
-  else if (len < 180) baseRem = 2.2;
-  else if (len < 260) baseRem = 1.75;
-  else if (len < 340) baseRem = 1.45;
-  else baseRem = 1.25;
+  const availW = w * 0.88;
+  const availH = h * 0.88 - 160;
 
-  return `calc(${baseRem * scale} * clamp(1.1rem, 3.8vw, 2.5rem))`;
+  const buffer = 0.82;
+  const calculatedPx = Math.sqrt(availH * availW / (0.77 * len)) * buffer;
+
+  const minPx = 14;
+  const maxPx = Math.min(64, w * 0.08);
+
+  const finalPx = Math.max(minPx, Math.min(maxPx, calculatedPx * scale));
+
+  return `${finalPx}px`;
 }
 
 function renderVerseCanvas(verse: BibleVerse, theme: Theme, ratio: Ratio): HTMLCanvasElement | null {
@@ -675,6 +679,20 @@ function App() {
   const [topic, setTopic] = useState<{ q: string; loading: boolean; hits: RefHit[]; error: string }>(
     { q: '', loading: false, hits: [], error: '' },
   );
+
+  const [windowSize, setWindowSize] = useState({
+    w: typeof window !== 'undefined' ? window.innerWidth : 1200,
+    h: typeof window !== 'undefined' ? window.innerHeight : 800
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleResize = () => {
+      setWindowSize({ w: window.innerWidth, h: window.innerHeight });
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const fullRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
@@ -1925,7 +1943,7 @@ function App() {
           <div className="fullview-inner">
               <p 
                 className="fullview-text"
-                style={{ fontSize: getFullviewFontSize(heroVerse.text, fontScale) }}
+                style={{ fontSize: getFullviewFontSize(heroVerse.text, fontScale, windowSize.w, windowSize.h) }}
               >
                 {heroVerse.text}
               </p>
