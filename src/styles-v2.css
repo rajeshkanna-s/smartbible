@@ -246,7 +246,7 @@
 .verse-hero--wide {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start; /* flex-start + margin: auto for safe scrollable centering */
   align-items: center;
   box-sizing: border-box;
   min-height: unset;
@@ -284,6 +284,21 @@
   padding: 6% 10%;
 }
 
+/* Margin auto-centering style to prevent flexbox center scroll cut-off */
+.verse-hero--square .verse-hero-text,
+.verse-hero--story .verse-hero-text,
+.verse-hero--wide .verse-hero-text {
+  margin-top: auto;
+  padding-top: max(40px, 12cqw); /* Clear absolute controls */
+}
+
+.verse-hero--square .verse-hero-ref,
+.verse-hero--story .verse-hero-ref,
+.verse-hero--wide .verse-hero-ref {
+  margin-bottom: auto;
+  padding-bottom: 24px;
+}
+
 /* Container-relative typography and styling for card children */
 .verse-hero--square .verse-hero-ref span,
 .verse-hero--story .verse-hero-ref span,
@@ -302,6 +317,26 @@
 .verse-hero--wide .hero-icon {
   height: max(30px, 8cqw);
   width: max(30px, 8cqw);
+}
+
+/* ---- Fullview Overlay Responsiveness & Centering ---- */
+.fullview-overlay {
+  justify-content: flex-start;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.fullview-overlay::-webkit-scrollbar {
+  display: none;
+}
+
+.fullview-inner {
+  margin-top: auto;
+  margin-bottom: auto;
+  padding-top: 80px;
+  padding-bottom: 120px;
+  width: 100%;
 }
 
 /* ---- AI follow-up chat ---- */

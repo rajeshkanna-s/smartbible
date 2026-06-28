@@ -284,6 +284,19 @@ function getHeroFontSize(text: string, ratio: Ratio, scale: number): string {
   return `clamp(${minPx}px, calc(${baseRem} * ${factor}cqw * ${scale}), ${maxPx}px)`;
 }
 
+function getFullviewFontSize(text: string, scale: number): string {
+  const len = text.length;
+  let baseRem = 2.4;
+
+  if (len < 100) baseRem = 2.8;
+  else if (len < 180) baseRem = 2.2;
+  else if (len < 260) baseRem = 1.75;
+  else if (len < 340) baseRem = 1.45;
+  else baseRem = 1.25;
+
+  return `calc(${baseRem * scale} * clamp(1.1rem, 3.8vw, 2.5rem))`;
+}
+
 function renderVerseCanvas(verse: BibleVerse, theme: Theme, ratio: Ratio): HTMLCanvasElement | null {
   const canvas = document.createElement('canvas');
   return paintVerseCanvas(canvas, verse, theme, ratio) ? canvas : null;
@@ -1919,7 +1932,12 @@ function App() {
             </button>
           </div>
           <div className="fullview-inner">
-            <p className="fullview-text">{heroVerse.text}</p>
+              <p 
+                className="fullview-text"
+                style={{ fontSize: getFullviewFontSize(heroVerse.text, fontScale) }}
+              >
+                {heroVerse.text}
+              </p>
             <div className="fullview-ref">
               <span>{heroVerse.ref}</span>
               {heroVerse.ref !== heroVerse.englishRef && <small>{heroVerse.englishRef}</small>}
