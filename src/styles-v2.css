@@ -246,16 +246,13 @@
 .verse-hero--wide {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* flex-start + margin: auto for safe scrollable centering */
+  justify-content: center; /* True vertical centering */
   align-items: center;
   box-sizing: border-box;
   min-height: unset;
   margin: 0 auto;
   width: 100%;
-  overflow-y: auto;
-  /* Hide scrollbars but allow scrolling if text is very long on small screens */
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  overflow: hidden; /* Prevent scrolling entirely inside the card */
   gap: 16px;
   container-type: inline-size; /* Enable container query width (cqw) support */
 }
@@ -282,21 +279,6 @@
   aspect-ratio: 16 / 9;
   max-width: 640px;
   padding: 6% 10%;
-}
-
-/* Margin auto-centering style to prevent flexbox center scroll cut-off */
-.verse-hero--square .verse-hero-text,
-.verse-hero--story .verse-hero-text,
-.verse-hero--wide .verse-hero-text {
-  margin-top: auto;
-  padding-top: max(40px, 12cqw); /* Clear absolute controls */
-}
-
-.verse-hero--square .verse-hero-ref,
-.verse-hero--story .verse-hero-ref,
-.verse-hero--wide .verse-hero-ref {
-  margin-bottom: auto;
-  padding-bottom: 24px;
 }
 
 /* Container-relative typography and styling for card children */

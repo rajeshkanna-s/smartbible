@@ -248,36 +248,24 @@ function getHeroFontSize(text: string, ratio: Ratio, scale: number): string {
   let baseRem = 1.4;
 
   if (ratio === 'wide') {
-    if (len < 100) baseRem = 1.8;
-    else if (len < 180) baseRem = 1.4;
-    else if (len < 260) baseRem = 1.15;
-    else if (len < 340) baseRem = 0.95;
-    else baseRem = 0.85;
+    baseRem = Math.max(0.75, 1.9 - len * 0.005);
   } else if (ratio === 'square') {
-    if (len < 100) baseRem = 2.2;
-    else if (len < 180) baseRem = 1.8;
-    else if (len < 260) baseRem = 1.5;
-    else if (len < 340) baseRem = 1.25;
-    else baseRem = 1.1;
+    baseRem = Math.max(0.85, 2.3 - len * 0.0065);
   } else { // story
-    if (len < 100) baseRem = 1.8;
-    else if (len < 180) baseRem = 1.35;
-    else if (len < 260) baseRem = 1.1;
-    else if (len < 340) baseRem = 0.95;
-    else baseRem = 0.85;
+    baseRem = Math.max(0.8, 2.3 - len * 0.0075);
   }
 
   let factor = 3.33;
-  let minPx = 13;
+  let minPx = 11;
   let maxPx = 44;
 
   if (ratio === 'wide') {
     factor = 2.5;
-    minPx = 12;
+    minPx = 11;
     maxPx = 40;
   } else if (ratio === 'story') {
     factor = 4.44;
-    minPx = 13;
+    minPx = 11;
     maxPx = 48;
   }
 
