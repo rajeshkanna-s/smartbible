@@ -193,13 +193,16 @@ function downloadVersePng(verse: BibleVerse, theme: Theme) {
     y += lineHeight;
   }
 
+  const sameRef = verse.ref === verse.englishRef;
   ctx.fillStyle = theme.accent;
   ctx.font = `800 46px ${PNG_FONT}`;
-  ctx.fillText(verse.ref, size / 2, size - 188);
+  ctx.fillText(verse.ref, size / 2, sameRef ? size - 150 : size - 188);
 
-  ctx.fillStyle = theme.sub;
-  ctx.font = `700 32px ${PNG_FONT}`;
-  ctx.fillText(verse.englishRef, size / 2, size - 128);
+  if (!sameRef) {
+    ctx.fillStyle = theme.sub;
+    ctx.font = `700 32px ${PNG_FONT}`;
+    ctx.fillText(verse.englishRef, size / 2, size - 128);
+  }
 
   ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
   ctx.font = `700 26px ${PNG_FONT}`;
@@ -844,7 +847,7 @@ function App() {
               <p className="verse-hero-text">{heroVerse.text}</p>
               <div className="verse-hero-ref">
                 <span>{heroVerse.ref}</span>
-                <small>{heroVerse.englishRef}</small>
+                {heroVerse.ref !== heroVerse.englishRef && <small>{heroVerse.englishRef}</small>}
               </div>
             </article>
 
@@ -971,7 +974,7 @@ function App() {
                 <p className="card-text">{verse.text}</p>
                 <div className="card-ref">
                   <span>{verse.ref}</span>
-                  <small>{verse.englishRef}</small>
+                  {verse.ref !== verse.englishRef && <small>{verse.englishRef}</small>}
                 </div>
               </div>
             ))}
@@ -1009,7 +1012,7 @@ function App() {
             <p className="fullview-text">{heroVerse.text}</p>
             <div className="fullview-ref">
               <span>{heroVerse.ref}</span>
-              <small>{heroVerse.englishRef}</small>
+              {heroVerse.ref !== heroVerse.englishRef && <small>{heroVerse.englishRef}</small>}
             </div>
           </div>
           <p className="fullview-hint">Press Esc or tap ✕ to exit</p>
