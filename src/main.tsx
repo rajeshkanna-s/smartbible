@@ -14,6 +14,7 @@ import {
 import {
   chaptersForBook,
   filterVerses,
+  hasActiveFilters,
   parseReferenceCode,
   resultWindow,
   versesForChapter,
@@ -216,6 +217,8 @@ function App() {
   const [fullView, setFullView] = useState(false);
   const fullRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
+  const resultsRef = useRef<HTMLElement>(null);
+  const didMountRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -384,6 +387,32 @@ function App() {
       heroRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [focused]);
+
+  // On small screens the filter bar fills the viewport, so scroll the results into
+  // view once a filter is applied. Debounced so typing a search doesn't jump per key.
+  useEffect(() => {
+    // Skip the very first render (initial load) so we don't scroll past the filters.
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
+    if (typeof window === 'undefined' || window.innerWidth > 760) return;
+    if (!hasActiveFilters(state) || (!results.length && !heroVerse)) return;
+
+    const timer = setTimeout(() => {
+      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [
+    results.length,
+    heroVerse,
+    state.referenceCode,
+    state.bookIndex,
+    state.chapter,
+    state.verse,
+    state.searchText,
+    state.testament,
+  ]);
 
   async function fetchLanguage(language: LanguageManifest): Promise<BibleData> {
     const response = await fetch(language.file);
@@ -604,7 +633,7 @@ function App() {
         </div>
       </section>
 
-      <section className="results" aria-live="polite">
+      <section className="results" aria-live="polite" ref={resultsRef}>
         <div className="result-head">
           <div>
             <p className="eyebrow">{selectedLanguage?.label ?? 'Bible'}</p>
