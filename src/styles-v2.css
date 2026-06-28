@@ -240,6 +240,49 @@
   color: #9aa6b8;
 }
 
+/* ---- Aspect ratio variants for the main verse-hero card ---- */
+.verse-hero--square,
+.verse-hero--story,
+.verse-hero--wide {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  min-height: unset;
+  margin: 0 auto;
+  width: 100%;
+  overflow-y: auto;
+  /* Hide scrollbars but allow scrolling if text is very long on small screens */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  gap: 16px;
+}
+
+.verse-hero--square::-webkit-scrollbar,
+.verse-hero--story::-webkit-scrollbar,
+.verse-hero--wide::-webkit-scrollbar {
+  display: none;
+}
+
+.verse-hero--square {
+  aspect-ratio: 1 / 1;
+  max-width: 480px;
+  padding: 8% 6%;
+}
+
+.verse-hero--story {
+  aspect-ratio: 9 / 16;
+  max-width: 360px;
+  padding: 12% 8%;
+}
+
+.verse-hero--wide {
+  aspect-ratio: 16 / 9;
+  max-width: 640px;
+  padding: 6% 10%;
+}
+
 /* ---- AI follow-up chat ---- */
 .ai-chat {
   border-top: 1px dashed #d9deec;

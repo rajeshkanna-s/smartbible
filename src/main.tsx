@@ -243,6 +243,33 @@ function paintVerseCanvas(
   return true;
 }
 
+function getHeroFontSize(text: string, ratio: Ratio, scale: number): string {
+  const len = text.length;
+  let baseRem = 1.4;
+
+  if (ratio === 'wide') {
+    if (len < 100) baseRem = 1.8;
+    else if (len < 180) baseRem = 1.4;
+    else if (len < 260) baseRem = 1.15;
+    else if (len < 340) baseRem = 0.95;
+    else baseRem = 0.85;
+  } else if (ratio === 'square') {
+    if (len < 100) baseRem = 2.2;
+    else if (len < 180) baseRem = 1.8;
+    else if (len < 260) baseRem = 1.5;
+    else if (len < 340) baseRem = 1.25;
+    else baseRem = 1.1;
+  } else { // story
+    if (len < 100) baseRem = 1.8;
+    else if (len < 180) baseRem = 1.35;
+    else if (len < 260) baseRem = 1.1;
+    else if (len < 340) baseRem = 0.95;
+    else baseRem = 0.85;
+  }
+
+  return `${baseRem * scale}rem`;
+}
+
 function renderVerseCanvas(verse: BibleVerse, theme: Theme, ratio: Ratio): HTMLCanvasElement | null {
   const canvas = document.createElement('canvas');
   return paintVerseCanvas(canvas, verse, theme, ratio) ? canvas : null;
@@ -1526,7 +1553,7 @@ function App() {
             </div>
 
             <article
-              className="verse-hero"
+              className={`verse-hero verse-hero--${pngRatio}`}
               onClick={() => openFullView()}
               role="button"
               tabIndex={0}
@@ -1576,7 +1603,12 @@ function App() {
                   <Maximize2 size={18} />
                 </button>
               </div>
-              <p className="verse-hero-text">{heroVerse.text}</p>
+              <p 
+                className="verse-hero-text"
+                style={{ fontSize: getHeroFontSize(heroVerse.text, pngRatio, fontScale) }}
+              >
+                {heroVerse.text}
+              </p>
               <div className="verse-hero-ref">
                 <span>{heroVerse.ref}</span>
                 {heroVerse.ref !== heroVerse.englishRef && <small>{heroVerse.englishRef}</small>}
@@ -1603,12 +1635,6 @@ function App() {
               </div>
             </div>
 
-            <div className="png-preview-wrap">
-              <canvas className="png-preview" ref={previewRef} aria-label="Image preview" />
-              <span className="png-preview-cap">
-                Preview · {RATIO_SIZES[pngRatio].w}×{RATIO_SIZES[pngRatio].h}
-              </span>
-            </div>
 
             <div className="explain-actions">
               <button className="explain-button" onClick={() => openFullView()} type="button">
