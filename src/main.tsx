@@ -104,6 +104,28 @@ function buildExplainPrompt(verse: BibleVerse, languageLabel: string): string {
   ].join('\n');
 }
 
+// ---------- Color themes ----------
+type Theme = {
+  id: string;
+  name: string;
+  a: string; // gradient top
+  b: string; // gradient mid
+  c: string; // gradient bottom
+  accent: string; // native reference colour
+  sub: string; // english reference colour
+};
+
+const THEMES: Theme[] = [
+  { id: 'indigo', name: 'Indigo', a: '#4356b8', b: '#2f3b8f', c: '#232a73', accent: '#8ce0d6', sub: '#b9c2f2' },
+  { id: 'emerald', name: 'Emerald', a: '#1f9d7a', b: '#157a5f', c: '#0e5544', accent: '#ffe08a', sub: '#c4ecdc' },
+  { id: 'sunset', name: 'Sunset', a: '#ff7e5f', b: '#e85d6b', c: '#b23a64', accent: '#fff1c2', sub: '#ffd9cf' },
+  { id: 'royal', name: 'Royal', a: '#7b4dd8', b: '#5b34b0', c: '#3f2185', accent: '#ffd24d', sub: '#ddd0ff' },
+  { id: 'ocean', name: 'Ocean', a: '#1f9fce', b: '#1c77ad', c: '#16527f', accent: '#aef0d0', sub: '#c3e7f7' },
+  { id: 'rose', name: 'Rose', a: '#e0568a', b: '#c23a74', c: '#8f2a5e', accent: '#ffe6a3', sub: '#ffd2e2' },
+  { id: 'charcoal', name: 'Charcoal', a: '#3c4456', b: '#2a3140', c: '#181d27', accent: '#7fe0c6', sub: '#c3cad8' },
+  { id: 'wine', name: 'Wine', a: '#9c3a52', b: '#7a2840', c: '#561a2f', accent: '#ffd98a', sub: '#f3c9d2' },
+];
+
 // ---------- PNG export (dependency-free canvas render) ----------
 const PNG_FONT = "'Segoe UI', 'Nirmala UI', 'Noto Sans', system-ui, sans-serif";
 
@@ -128,7 +150,7 @@ function wrapCanvasLines(
   return lines;
 }
 
-function downloadVersePng(verse: BibleVerse) {
+function downloadVersePng(verse: BibleVerse, theme: Theme) {
   const size = 1080;
   const canvas = document.createElement('canvas');
   canvas.width = size;
@@ -137,9 +159,9 @@ function downloadVersePng(verse: BibleVerse) {
   if (!ctx) return;
 
   const bg = ctx.createLinearGradient(0, 0, size, size);
-  bg.addColorStop(0, '#4356b8');
-  bg.addColorStop(0.55, '#2f3b8f');
-  bg.addColorStop(1, '#1d2566');
+  bg.addColorStop(0, theme.a);
+  bg.addColorStop(0.55, theme.b);
+  bg.addColorStop(1, theme.c);
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, size, size);
 
@@ -171,11 +193,11 @@ function downloadVersePng(verse: BibleVerse) {
     y += lineHeight;
   }
 
-  ctx.fillStyle = '#8ce0d6';
+  ctx.fillStyle = theme.accent;
   ctx.font = `800 46px ${PNG_FONT}`;
   ctx.fillText(verse.ref, size / 2, size - 188);
 
-  ctx.fillStyle = '#c4cbf4';
+  ctx.fillStyle = theme.sub;
   ctx.font = `700 32px ${PNG_FONT}`;
   ctx.fillText(verse.englishRef, size / 2, size - 128);
 
@@ -215,6 +237,7 @@ function App() {
   const [ai, setAi] = useState<AiState>(emptyAi);
   const [compare, setCompare] = useState<CompareState>(emptyCompare);
   const [fullView, setFullView] = useState(false);
+  const [theme, setTheme] = useState<Theme>(THEMES[0]);
   const fullRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const resultsRef = useRef<HTMLElement>(null);
@@ -472,7 +495,18 @@ function App() {
   }
 
   return (
-    <main className="app-shell">
+    <main
+      className="app-shell"
+      style={
+        {
+          '--theme-a': theme.a,
+          '--theme-b': theme.b,
+          '--theme-c': theme.c,
+          '--theme-accent': theme.accent,
+          '--theme-sub': theme.sub,
+        } as React.CSSProperties
+      }
+    >
       <header className="topbar">
         <div className="brand">
           <span className="brand-badge">
@@ -650,6 +684,25 @@ function App() {
         {error && <div className="notice error">{error}</div>}
         {loading && <div className="notice">Loading local Bible JSON...</div>}
 
+        {results.length > 0 && (
+          <div className="theme-bar">
+            <span className="theme-label">Card colour</span>
+            <div className="theme-swatches" role="group" aria-label="Card colour">
+              {THEMES.map((item) => (
+                <button
+                  aria-label={item.name}
+                  className={`swatch ${item.id === theme.id ? 'active' : ''}`}
+                  key={item.id}
+                  onClick={() => setTheme(item)}
+                  style={{ background: `linear-gradient(135deg, ${item.a}, ${item.c})` }}
+                  title={item.name}
+                  type="button"
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
         {!loading && !error && !results.length && (
           <div className="empty-state">
             <BookOpen size={34} />
@@ -689,7 +742,7 @@ function App() {
                   className="hero-icon"
                   onClick={(event) => {
                     event.stopPropagation();
-                    downloadVersePng(heroVerse);
+                    downloadVersePng(heroVerse, theme);
                   }}
                   title="Download PNG"
                   type="button"
@@ -722,7 +775,7 @@ function App() {
               </button>
               <button
                 className="explain-button"
-                onClick={() => downloadVersePng(heroVerse)}
+                onClick={() => downloadVersePng(heroVerse, theme)}
                 type="button"
               >
                 <Download size={18} />
@@ -808,7 +861,7 @@ function App() {
                     className="card-icon"
                     onClick={(event) => {
                       event.stopPropagation();
-                      downloadVersePng(verse);
+                      downloadVersePng(verse, theme);
                     }}
                     title="Download PNG"
                     type="button"
@@ -849,7 +902,7 @@ function App() {
           <div className="fullview-controls">
             <button
               className="fullview-icon"
-              onClick={() => downloadVersePng(heroVerse)}
+              onClick={() => downloadVersePng(heroVerse, theme)}
               title="Download as PNG"
               type="button"
             >
