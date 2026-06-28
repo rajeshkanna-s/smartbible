@@ -225,6 +225,86 @@ type CompareState = { loading: boolean; rows: CompareRow[]; error: string };
 const emptyAi: AiState = { loading: false, text: '', error: '' };
 const emptyCompare: CompareState = { loading: false, rows: [], error: '' };
 
+// ---------- Lightweight markdown rendering for AI explanations ----------
+function renderInline(text: string, keyPrefix: string): React.ReactNode[] {
+  return text.split(/(\*\*[^*]+\*\*)/g).map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={`${keyPrefix}-${index}`}>{part.slice(2, -2)}</strong>;
+    }
+    return <React.Fragment key={`${keyPrefix}-${index}`}>{part}</React.Fragment>;
+  });
+}
+
+type ExplainSection = { num: string | null; title: string | null; body: string[] };
+
+function parseExplanation(raw: string): ExplainSection[] {
+  const lines = raw.replace(/\r/g, '').split('\n');
+  const sections: ExplainSection[] = [];
+  let current: ExplainSection | null = null;
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    const hashHeading = line.match(/^#{1,6}\s*(.+)$/);
+    const boldHeading = !hashHeading && line.match(/^\*\*(.+?)\*\*:?$/);
+    const headingText = hashHeading ? hashHeading[1] : boldHeading ? boldHeading[1] : null;
+
+    if (headingText) {
+      const numbered = headingText.match(/^(\d+)[.)]\s*(.+)$/);
+      current = {
+        num: numbered ? numbered[1] : null,
+        title: (numbered ? numbered[2] : headingText).replace(/\*\*/g, '').trim(),
+        body: [],
+      };
+      sections.push(current);
+    } else {
+      if (!current) {
+        current = { num: null, title: null, body: [] };
+        sections.push(current);
+      }
+      current.body.push(line);
+    }
+  }
+  return sections;
+}
+
+function ExplanationContent({ text }: { text: string }) {
+  const sections = parseExplanation(text);
+  let badge = 0;
+  return (
+    <div className="ai-rich">
+      {sections.map((section, sIndex) => {
+        const label = section.num ?? (section.title ? String(++badge) : null);
+        // Split the body into paragraphs on blank lines.
+        const paragraphs: string[] = [];
+        section.body.forEach((line) => {
+          if (line === '') {
+            if (paragraphs.length && paragraphs[paragraphs.length - 1] !== '') paragraphs.push('');
+          } else if (paragraphs.length && paragraphs[paragraphs.length - 1] !== '') {
+            paragraphs[paragraphs.length - 1] += ` ${line}`;
+          } else {
+            if (paragraphs.length && paragraphs[paragraphs.length - 1] === '') paragraphs.pop();
+            paragraphs.push(line);
+          }
+        });
+        const blocks = paragraphs.filter((p) => p !== '');
+        return (
+          <section className="ai-section" key={sIndex}>
+            {section.title && (
+              <div className="ai-section-head">
+                {label && <span className="ai-num">{label}</span>}
+                <h4>{renderInline(section.title, `h-${sIndex}`)}</h4>
+              </div>
+            )}
+            {blocks.map((para, pIndex) => (
+              <p key={pIndex}>{renderInline(para, `p-${sIndex}-${pIndex}`)}</p>
+            ))}
+          </section>
+        );
+      })}
+    </div>
+  );
+}
+
 function App() {
   const [manifest, setManifest] = useState<BibleManifest | null>(null);
   const [bibles, setBibles] = useState<Record<string, BibleData>>({});
@@ -800,17 +880,25 @@ function App() {
             </div>
 
             {panel === 'ai' && (
-              <div className="explain-panel">
-                <h3>
-                  <Sparkles size={16} /> AI explanation
-                </h3>
+              <div className="explain-panel explain-panel--ai">
+                <div className="ai-head">
+                  <span className="ai-head-badge">
+                    <Sparkles size={18} />
+                  </span>
+                  <div className="ai-head-text">
+                    <h3>AI explanation</h3>
+                    <span className="ai-head-sub">
+                      {heroVerse.englishRef} · {selectedLanguage?.label}
+                    </span>
+                  </div>
+                </div>
                 {ai.loading && (
                   <p className="explain-loading">
                     <Loader2 className="spin" size={18} /> Thinking through this verse…
                   </p>
                 )}
                 {ai.error && <p className="explain-error">{ai.error}</p>}
-                {ai.text && <div className="explain-text">{ai.text}</div>}
+                {ai.text && <ExplanationContent text={ai.text} />}
               </div>
             )}
 

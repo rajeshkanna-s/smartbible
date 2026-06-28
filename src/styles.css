@@ -680,6 +680,119 @@ select:focus {
   word-break: break-word;
 }
 
+/* ---------- AI explanation (unique design) ---------- */
+.explain-panel--ai {
+  background:
+    radial-gradient(120% 130% at 0% 0%, rgba(124, 142, 255, 0.16) 0%, rgba(124, 142, 255, 0) 55%),
+    radial-gradient(120% 130% at 100% 0%, rgba(94, 196, 144, 0.16) 0%, rgba(94, 196, 144, 0) 55%),
+    #ffffff;
+  border: 1px solid #e1e6f2;
+  gap: 18px;
+}
+
+.ai-head {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+}
+
+.ai-head-badge {
+  align-items: center;
+  background: linear-gradient(135deg, #5a6cf0, #2e4a36);
+  border-radius: 12px;
+  box-shadow: 0 8px 18px rgba(70, 86, 200, 0.32);
+  color: #ffffff;
+  display: inline-flex;
+  height: 42px;
+  justify-content: center;
+  width: 42px;
+}
+
+.ai-head-text {
+  display: grid;
+  gap: 2px;
+}
+
+.ai-head-text h3 {
+  color: #1c2438;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.ai-head-sub {
+  color: #6b7689;
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.ai-rich {
+  display: grid;
+  gap: 14px;
+}
+
+.ai-section {
+  background: #ffffff;
+  border: 1px solid #e7ebf4;
+  border-left: 4px solid #5a6cf0;
+  border-radius: 12px;
+  display: grid;
+  gap: 8px;
+  padding: 16px 18px;
+}
+
+.ai-section:nth-child(3n + 2) {
+  border-left-color: #2bb18a;
+}
+
+.ai-section:nth-child(3n) {
+  border-left-color: #e0568a;
+}
+
+.ai-section-head {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.ai-num {
+  align-items: center;
+  background: linear-gradient(135deg, #5a6cf0, #3a44a8);
+  border-radius: 50%;
+  color: #ffffff;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 0.85rem;
+  font-weight: 850;
+  height: 26px;
+  justify-content: center;
+  width: 26px;
+}
+
+.ai-section:nth-child(3n + 2) .ai-num {
+  background: linear-gradient(135deg, #2bb18a, #1c8a6a);
+}
+
+.ai-section:nth-child(3n) .ai-num {
+  background: linear-gradient(135deg, #e0568a, #b23a6d);
+}
+
+.ai-section-head h4 {
+  color: #1c2438;
+  font-size: 1.02rem;
+  margin: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.ai-section p {
+  color: #2c3650;
+  font-size: 1rem;
+  line-height: 1.7;
+  margin: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 .compare-row {
   border-top: 1px solid #e7ede4;
   display: grid;
