@@ -267,7 +267,21 @@ function getHeroFontSize(text: string, ratio: Ratio, scale: number): string {
     else baseRem = 0.85;
   }
 
-  return `${baseRem * scale}rem`;
+  let factor = 3.33;
+  let minPx = 13;
+  let maxPx = 44;
+
+  if (ratio === 'wide') {
+    factor = 2.5;
+    minPx = 12;
+    maxPx = 40;
+  } else if (ratio === 'story') {
+    factor = 4.44;
+    minPx = 13;
+    maxPx = 48;
+  }
+
+  return `clamp(${minPx}px, calc(${baseRem} * ${factor}cqw * ${scale}), ${maxPx}px)`;
 }
 
 function renderVerseCanvas(verse: BibleVerse, theme: Theme, ratio: Ratio): HTMLCanvasElement | null {

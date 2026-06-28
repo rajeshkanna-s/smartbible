@@ -257,6 +257,7 @@
   scrollbar-width: none;
   -ms-overflow-style: none;
   gap: 16px;
+  container-type: inline-size; /* Enable container query width (cqw) support */
 }
 
 .verse-hero--square::-webkit-scrollbar,
@@ -281,6 +282,26 @@
   aspect-ratio: 16 / 9;
   max-width: 640px;
   padding: 6% 10%;
+}
+
+/* Container-relative typography and styling for card children */
+.verse-hero--square .verse-hero-ref span,
+.verse-hero--story .verse-hero-ref span,
+.verse-hero--wide .verse-hero-ref span {
+  font-size: max(13px, 3.8cqw);
+}
+
+.verse-hero--square .verse-hero-ref small,
+.verse-hero--story .verse-hero-ref small,
+.verse-hero--wide .verse-hero-ref small {
+  font-size: max(11px, 2.8cqw);
+}
+
+.verse-hero--square .hero-icon,
+.verse-hero--story .hero-icon,
+.verse-hero--wide .hero-icon {
+  height: max(30px, 8cqw);
+  width: max(30px, 8cqw);
 }
 
 /* ---- AI follow-up chat ---- */
