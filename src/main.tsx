@@ -670,6 +670,8 @@ function App() {
   const [pngRatio, setPngRatio] = useState<Ratio>('square');
   const [copied, setCopied] = useState(false);
   const [speaking, setSpeaking] = useState(false);
+  const [speechMsg, setSpeechMsg] = useState('');
+  const [installEvent, setInstallEvent] = useState<{ prompt: () => void; userChoice: Promise<unknown> } | null>(null);
   const [related, setRelated] = useState<{ loading: boolean; hits: RefHit[]; error: string }>({
     loading: false,
     hits: [],
@@ -941,6 +943,34 @@ function App() {
     }
   }, []);
 
+  // Capture the install prompt so we can offer an explicit "Install" button.
+  useEffect(() => {
+    function onPrompt(event: Event) {
+      event.preventDefault();
+      setInstallEvent(event as unknown as { prompt: () => void; userChoice: Promise<unknown> });
+    }
+    function onInstalled() {
+      setInstallEvent(null);
+    }
+    window.addEventListener('beforeinstallprompt', onPrompt);
+    window.addEventListener('appinstalled', onInstalled);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', onPrompt);
+      window.removeEventListener('appinstalled', onInstalled);
+    };
+  }, []);
+
+  async function installApp() {
+    if (!installEvent) return;
+    installEvent.prompt();
+    try {
+      await installEvent.userChoice;
+    } catch {
+      /* dismissed */
+    }
+    setInstallEvent(null);
+  }
+
   // Track recently viewed verses.
   useEffect(() => {
     if (!heroVerse) return;
@@ -1026,6 +1056,18 @@ function App() {
     const match =
       voices.find((v) => v.lang && v.lang.toLowerCase() === lang.toLowerCase()) ||
       voices.find((v) => v.lang && v.lang.toLowerCase().startsWith(base));
+
+    // Desktop browsers often have no Indic voice installed → speech is silent.
+    // Detect that (voices are loaded but none match) and tell the user.
+    if (!match && voices.length > 0 && state.languageId !== 'english') {
+      setSpeechMsg(
+        `No ${selectedLanguage?.label ?? 'this language'} voice is installed on this device. Read aloud works on most phones.`,
+      );
+      window.setTimeout(() => setSpeechMsg(''), 6000);
+      return;
+    }
+
+    setSpeechMsg('');
     if (match) utter.voice = match;
     utter.lang = match?.lang || lang;
     utter.rate = 0.95;
@@ -1180,6 +1222,12 @@ function App() {
               value={fontScale}
             />
           </div>
+          {installEvent && (
+            <button className="tool-button install-button" onClick={installApp} type="button">
+              <Download size={16} />
+              Install app
+            </button>
+          )}
           <button
             className={`tool-button ${savedOpen ? 'active' : ''}`}
             onClick={() => setSavedOpen((v) => !v)}
@@ -1736,6 +1784,8 @@ function App() {
                 Compare languages
               </button>
             </div>
+
+            {speechMsg && <p className="speech-note">{speechMsg}</p>}
 
             {panel === 'ai' && (
               <div className="explain-panel explain-panel--ai">

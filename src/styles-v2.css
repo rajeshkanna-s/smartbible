@@ -83,6 +83,33 @@
   width: 96px;
 }
 
+.install-button {
+  background: linear-gradient(135deg, #5a6cf0, #2e4a36);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+.install-button:hover {
+  filter: brightness(1.06);
+}
+
+.speech-note {
+  background: #fff7e6;
+  border: 1px solid #f3d79a;
+  border-radius: 10px;
+  color: #7a5b16;
+  font-weight: 700;
+  margin: 0;
+  padding: 10px 14px;
+  text-align: center;
+}
+
+.app-shell.dark .speech-note {
+  background: #2a2412;
+  border-color: #5a4a1e;
+  color: #f1d99a;
+}
+
 /* ---- Topic finder ---- */
 .topic-bar {
   background: #ffffff;
